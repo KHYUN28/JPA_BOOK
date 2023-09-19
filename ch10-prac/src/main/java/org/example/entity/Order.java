@@ -17,8 +17,12 @@ public class Order {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "MEMBER_ID")
+    @JoinColumn(name = "MEMBER_ID") // member_id는 회원과의 관계를 나타내는 외래 키 컬럼 이름입니다.
     private Member member;      //주문 회원
+
+//    @ManyToOne//(mappedBy = "order") // , cascade = CascadeType.ALL /  mappedBy는 OrderItem 엔티티에서의 필드 이름을 나타냅니다.
+//    @JoinColumn(name = "order_id")
+//    private List<Order> Items = new ArrayList<>();
 
     private Date orderDate;     //주문시간
 

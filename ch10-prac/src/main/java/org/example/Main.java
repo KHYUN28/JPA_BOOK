@@ -50,8 +50,10 @@ public class Main {
 //            testNewDto(em);
 //            testPagingAPI(em);
 //            jpqlJoin10_25(em);
-            collectionJoin(em);
+//            collectionJoin(em);
 //            testfetchjoin(em);
+//            foreignEntity(em);
+//            test(em);
             tx.commit();//트랜잭션 커밋
 
         } catch (Exception e) {
@@ -324,6 +326,7 @@ public class Main {
     }
 
     public static void testfetchjoin(EntityManager em) {
+
         Team team1 = new Team();
         team1.setName("incheon1");
         em.persist(team1);
@@ -376,10 +379,55 @@ public class Main {
             System.out.println("teamName = " + t.getName());
             for (Member m : t.getMembers())
                 System.out.println("memberName = " + m.getUsername() + ", " + "teamId = " + m.getId() +
-                    ", " + "teamName = " + m.getUsername());
+                        ", " + "teamName = " + m.getUsername());
         }
     }
 
+    // Example 10.46
+    public static void foreignEntity(EntityManager em){
+
+        Team team1 = new Team();
+        team1.setName("incheon1");
+        em.persist(team1);
+
+        Team team2 = new Team();
+        team2.setName("incheon2");
+        em.persist(team2);
+
+        Member member1 = new Member();
+        member1.setUsername("1st");
+        member1.setTeam(team1);
+        em.persist(member1);
+
+        Member member2 = new Member();
+        member2.setUsername("2nd");
+        member2.setTeam(team1);
+        em.persist(member2);
+
+        Member member3 = new Member();
+        member3.setUsername("3rd");
+        member3.setTeam(team2);
+        em.persist(member3);
+
+        em.flush();
+        em.clear();
+
+        // 외래키를 전달함으로 인해서 암시적 조인이 발생하지 않는다.
+//        String qlString = "select m from Member m where m.team.id = :team.id";
+//        List<Member> resultList = em.createQuery(qlString, Member.class)
+//                .setParameter("teamId",1l)
+//                .getResultList();
+
+
+        // 암시적 조인이 발생함.
+        Team team = em.find(Team.class, 1L);
+        String qlString = "select m from Member m where m.team.name = :name";
+        List<Member> resultList = em.createQuery(qlString, Member.class)
+                .setParameter("name", team.getName())
+                .getResultList();
+
+        System.out.println("resultList = " + resultList);
+    }
 //    public static void order (EntityManager em) {
 //
 //
@@ -410,6 +458,57 @@ public class Main {
 //            System.out.println("zipcode : " + a.getZipcode());
 //        }
 //    }
+
+//    public static void NamedQueries(EntityManager em) {
+//
+//        List<Member> resultList = em.createNamedQuery("Member.findByUsername", Member.class)
+//                .setParameter("username", "회원1")
+//                .getResultList();
+//
+//        System.out.println("resultList = " + resultList);
+//    }
+
+//    public static void bulkOperation(EntityManager em) {
+//
+//        Product product1 = new Product();
+//        product1.setName("음료");
+//        product1.setPrice(1000);
+//        product1.setStockAmount(100);
+//        em.persist(product1);
+//
+//        em.flush();
+//        em.clear();
+//
+//        Product product = em.createQuery("product1.findByName", Product.class)
+//                .setParameter("name","라면")
+//                .getSingleResult();
+//    }
+
+    public static void test(EntityManager em) {
+        Team team = new Team();
+        team.setName("incheon");
+        em.persist(team);
+
+        Member member1 = new Member();
+        member1.setUsername("1stUser");
+        member1.setTeam(team);
+        em.persist(member1);
+
+        Member member2 = new Member();
+        member2.setUsername("2ndUser");
+        member2.setTeam(team);
+        em.persist(member2);
+
+        em.flush();
+        em.clear();
+
+        em.find(Member.class, "1stUser");
+
+        List<Member> resultList = em.createQuery("SELECT m FROM Member m", Member.class)
+                .getResultList();
+
+        System.out.println("resultList = " + resultList);
+    }
 }
 
 /*

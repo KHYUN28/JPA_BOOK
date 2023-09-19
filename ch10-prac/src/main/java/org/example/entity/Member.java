@@ -5,6 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(name = "findByUsername", query = "SELECT m FROM Member m"),
+        @NamedQuery(name = "findByUsernameId", query = "SELECT m FROM Member m WHERE m.team.name = :name")
+})
 public class Member {
 
     @Id @GeneratedValue
@@ -21,7 +25,8 @@ public class Member {
 
     @OneToMany
     @JoinColumn(name = "ORDER_ID")
-    private List<Order> orders;
+    private List<Order> orders = new ArrayList<>();
+//    private List<Order> orders;
 
     public Member() { }
 
